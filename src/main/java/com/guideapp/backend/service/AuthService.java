@@ -1,13 +1,19 @@
 package com.guideapp.backend.service;
 
-import com.guideapp.backend.dto.LoginRequest;
-import com.guideapp.backend.dto.SignUpRequest;
+import com.guideapp.backend.dto.request.LoginRequest;
+import com.guideapp.backend.dto.request.SignUpRequest;
+import com.guideapp.backend.dto.response.AuthResponse;
+import com.guideapp.backend.exception.IncorrectPasswordException;
+import com.guideapp.backend.exception.UserAlreadyExistsException;
+import com.guideapp.backend.exception.UserNotFoundException;
 import com.guideapp.backend.repository.UserRepository;
-import org.springframework.security.core.userdetails.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.guideapp.backend.entity.User;
+
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -23,36 +29,42 @@ public class AuthService {
         this.encoder = encoder;
     }
 
-    public String login(LoginRequest loginRequest) {
-
-        // Check whether the user exists
-        // Check whether the password is correct (using encoder)
-
-        User user = this.userRepo.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public AuthResponse login(LoginRequest loginRequest) {
+        // Are these messages ok? is it secure to write details about the Exception?
+        User user = this.userRepo.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED));
 
         if (encoder.matches(loginRequest.getPassword(), user.getPassword_hash()))
         {
-            return ("Log in successful");
+            // return jwt token in http response
+            AuthResponse auth = new AuthResponse();
+            auth.setEmail(loginRequest.getEmail());
+            return auth;
         }
-        else return ("Log in failed");
+        else {
+            throw new IncorrectPasswordException("Incorrect password", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        }
     }
 
-    public String signup(SignUpRequest signUpRequest) {
+
+    public AuthResponse signup(SignUpRequest signUpRequest) {
 
         // Check whether the user does not already exist
+        // Check wether the email does not already exist
         // Check whether the password is safe enough
         // Check more things if necessary
         // Encode the password into hash
 
         if (userRepo.findByUsername(signUpRequest.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new UserAlreadyExistsException("User already exists", "CONFLICT", HttpStatus.CONFLICT);
+        }
+
+        if (userRepo.findByEmail(signUpRequest.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("User already exists", "CONFLICT", HttpStatus.CONFLICT);
         }
 
         if (!signUpRequest.getPassword().matches(PASSWORD_PATTERN)) {
-            throw new RuntimeException(
-                    "Password must be at least 8 characters, contain at least one uppercase letter and one number"
-            );
+            throw new IncorrectPasswordException("Invalid password format", "BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
 
         // Creating User Entity to save into BD
@@ -65,6 +77,8 @@ public class AuthService {
 
         this.userRepo.save(user);
 
-        return ("Signed up successfully");
+        UUID userId = user.getId();
+
+        return new AuthResponse(userId, user.getUsername(), user.getEmail());
     }
 }

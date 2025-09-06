@@ -1,15 +1,17 @@
 package com.guideapp.backend.controller;
 
 
-import com.guideapp.backend.dto.LoginRequest;
-import com.guideapp.backend.dto.SignUpRequest;
-import com.guideapp.backend.repository.UserRepository;
+import com.guideapp.backend.dto.request.LoginRequest;
+import com.guideapp.backend.dto.request.SignUpRequest;
+import com.guideapp.backend.dto.response.AuthResponse;
+import com.guideapp.backend.dto.response.SuccessResponse;
 import com.guideapp.backend.service.AuthService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.time.Instant;
 
+@CrossOrigin(origins = "http://localhost:8081")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -20,16 +22,27 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // This annotation is used to associate a url, and a method
     @PostMapping("login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-        return this.authService.login(loginRequest);
+    public SuccessResponse<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+        AuthResponse auth = this.authService.login(loginRequest);
+        SuccessResponse<AuthResponse> success = new SuccessResponse<AuthResponse>();
+        success.setMessage("Logged in");
+        success.setStatus(HttpStatus.OK.value());
+        success.setTimestamp(Instant.now());
+        success.setData(auth);
+
+        return success;
     }
 
-    // @ResquestBody sirve para recibir datos de una solicitud HTTP.
-    // Spring transforma los datos recibidos en formato JSON o XML a clase Java
     @PostMapping("signup")
-    public String signup(@RequestBody SignUpRequest signUpRequest) {
-        return this.authService.signup(signUpRequest);
+    public SuccessResponse<AuthResponse> signup(@RequestBody SignUpRequest signUpRequest) {
+        AuthResponse auth = this.authService.signup(signUpRequest);
+        SuccessResponse<AuthResponse> success = new SuccessResponse<AuthResponse>();
+        success.setMessage("User created");
+        success.setStatus(HttpStatus.CREATED.value());
+        success.setTimestamp(Instant.now());
+        success.setData(auth);
+
+        return success;
     }
 }

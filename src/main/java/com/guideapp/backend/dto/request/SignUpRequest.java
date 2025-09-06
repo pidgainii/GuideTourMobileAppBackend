@@ -1,4 +1,4 @@
-package com.guideapp.backend.dto;
+package com.guideapp.backend.dto.request;
 
 public class SignUpRequest {
     private String username;
