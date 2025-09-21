@@ -6,7 +6,7 @@ import com.guideapp.backend.dto.response.AuthResponse;
 import com.guideapp.backend.exception.IncorrectPasswordException;
 import com.guideapp.backend.exception.UserAlreadyExistsException;
 import com.guideapp.backend.exception.UserNotFoundException;
-import com.guideapp.backend.jwt.JwtService;
+import com.guideapp.backend.security.JwtService;
 import com.guideapp.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

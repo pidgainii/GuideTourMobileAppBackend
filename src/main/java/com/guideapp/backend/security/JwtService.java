@@ -1,4 +1,4 @@
-package com.guideapp.backend.jwt;
+package com.guideapp.backend.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "iuwhfvwhwhefpohweo98ryfhqecq02h03rhwvohwref";
+    private static final String SECRET_KEY = "c2FtdWVnYWJyaWVseWV2Z2VuMTg5MzR1MXdmbndmZW5vZXdmOTkxMzM0";
 
     public String getToken(UserDetails user) {
         return getToken(new HashMap<>(), user);
@@ -39,13 +39,14 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         return getClaim(token, Claims::getSubject);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String email = getEmailFromToken(token);
+        // The method of user details is called getUsername (Spring Security declaration), but it will return the email
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private Claims getAllClaims(String token) {

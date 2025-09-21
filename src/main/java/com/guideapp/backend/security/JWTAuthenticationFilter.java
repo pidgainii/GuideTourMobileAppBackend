@@ -1,4 +1,4 @@
-package com.guideapp.backend.jwt;
+package com.guideapp.backend.security;
 
 
 import jakarta.servlet.FilterChain;
@@ -11,8 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -31,19 +29,18 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
-        final String username;
+        final String email;
 
-        if (token == null)
-        {
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-
-        username = jwtService.getUsernameFromToken(token);
-        if (username != null && SecurityContextHolder.getContext().getAuthentication()==null)
+        email = jwtService.getEmailFromToken(token);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication()==null)
         {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            // It will actually use the email, but the method must be named loadUserByUsername because it is declared this way in Spring Boot
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtService.isTokenValid(token, userDetails))
             {
@@ -55,6 +52,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+
     }
 
     private String getTokenFromRequest(HttpServletRequest request)

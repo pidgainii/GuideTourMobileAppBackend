@@ -13,7 +13,7 @@ public class AuthResponse {
     private UUID userId;
     private String username;
     private String email;
-    private String jwtToken; // optional: null for signup
+    private String jwtToken;
 
     public AuthResponse(UUID id, String username, String email)
     {
