@@ -3,9 +3,11 @@ package com.guideapp.backend.service;
 import com.guideapp.backend.dto.request.LoginRequest;
 import com.guideapp.backend.dto.request.SignUpRequest;
 import com.guideapp.backend.dto.response.AuthResponse;
+import com.guideapp.backend.entity.RevokedToken;
 import com.guideapp.backend.exception.IncorrectPasswordException;
 import com.guideapp.backend.exception.UserAlreadyExistsException;
 import com.guideapp.backend.exception.UserNotFoundException;
+import com.guideapp.backend.repository.TokenRepository;
 import com.guideapp.backend.security.JwtService;
 import com.guideapp.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +16,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.guideapp.backend.entity.User;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,6 +33,7 @@ public class AuthService {
             "^(?=.*[A-Z])(?=.*\\d).{8,}$";
 
     private final UserRepository userRepo;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final AuthenticationManager authManager;

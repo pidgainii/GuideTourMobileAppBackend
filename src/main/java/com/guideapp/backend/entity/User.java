@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
@@ -41,8 +43,15 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority("tourist"));
     }
 
+    // Spring Security username (email is used)
     @Override
     public String getUsername() {
         return email;
+    }
+
+    // This is for the frontend indo
+    @JsonProperty("username")
+    public String getRealUsername() {
+        return username;
     }
 }
