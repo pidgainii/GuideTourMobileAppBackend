@@ -12,8 +12,8 @@ import java.util.List;
 @Setter
 public class CreateLocationRequest {
     private String name;
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
     private String description;
     private String category;
     private List<String> mediaUrls;

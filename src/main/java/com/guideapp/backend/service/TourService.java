@@ -76,7 +76,7 @@ public class TourService {
             location.setName(lReq.getName());
 
             // --- CREATING THE COORDINATES IN PROPER FORMAT ---
-            Coordinate[] coordinates = new Coordinate[]{new Coordinate(40.991739, 29.024168)};
+            Coordinate[] coordinates = new Coordinate[]{new Coordinate(lReq.getLongitude(), lReq.getLatitude())};
             CoordinateSequence coordinateSequence = new CoordinateArraySequence(coordinates);
             GeometryFactory geometryFactory = new GeometryFactory();
             Point point = geometryFactory.createPoint(coordinateSequence);
