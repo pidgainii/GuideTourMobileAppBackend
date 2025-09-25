@@ -30,7 +30,8 @@ public class Tour {
 
     private String description;
 
-    private String category;
+    @Column(name = "category")
+    private String country;
 
     private String status;
 

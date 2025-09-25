@@ -8,9 +8,8 @@ import java.time.Instant;
 
 @Data
 @NoArgsConstructor
-public class SuccessResponse<T> {
+@AllArgsConstructor
+public class SuccessResponse {
     private String message;
-    private int status;
     private Instant timestamp;
-    private T data;
 }

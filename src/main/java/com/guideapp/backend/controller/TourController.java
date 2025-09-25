@@ -1,6 +1,8 @@
 package com.guideapp.backend.controller;
 
 
+import com.guideapp.backend.dto.request.CreateTourRequest;
+import com.guideapp.backend.dto.response.SuccessResponse;
 import com.guideapp.backend.entity.Tour;
 import com.guideapp.backend.service.TourService;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +38,9 @@ public class TourController {
         return ResponseEntity.ok(tours);
     }
 
-    @GetMapping("/favorites")
-    public ResponseEntity<List<Tour>> getFavorites() {
-        List<Tour> tours = tourService.getFavorites();
-        return ResponseEntity.ok(tours);
+    @PostMapping("/save")
+    public ResponseEntity<SuccessResponse> createTour(@RequestBody CreateTourRequest request) {
+        SuccessResponse response = tourService.createTour(request);
+        return ResponseEntity.ok(response);
     }
 }

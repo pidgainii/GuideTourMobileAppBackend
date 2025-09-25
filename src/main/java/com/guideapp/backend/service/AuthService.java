@@ -80,8 +80,6 @@ public class AuthService {
         user.setRole(signUpRequest.getRole());
 
         this.userRepo.save(user);
-        UUID userId = user.getId();
-        user.setId(userId);
 
         //for security
         user.setPassword("");

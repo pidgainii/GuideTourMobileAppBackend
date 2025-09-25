@@ -20,6 +20,9 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<User> getUser(){
         User user = userService.getCurrentUser();
+
+        // for security
+        user.setPassword("");
         return ResponseEntity.ok(user);
     }
 }
