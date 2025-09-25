@@ -54,12 +54,12 @@ public class TourService {
     }
 
     public SuccessResponse createTour(CreateTourRequest request) {
-
         Tour tour = new Tour();
         tour.setGuide(userService.getCurrentUser());
         tour.setTitle(request.getTitle());
         tour.setDescription(request.getDescription());
         tour.setCountry(request.getCountry());
+        tour.setStatus("published");
         tour.setThumbnailUrl(request.getThumbnail());
         tour.setRatingAvg((request.getRating_avg()));
         tour.setViews((request.getRating_n()));
@@ -70,7 +70,7 @@ public class TourService {
         Integer locationIndex = 0;
 
         List<CreateLocationRequest> locations = request.getLocations();
-        for (CreateLocationRequest lReq: locations) {
+        for (CreateLocationRequest lReq : locations) {
             Location location = new Location();
             location.setTour(tour);
             location.setName(lReq.getName());

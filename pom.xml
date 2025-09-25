@@ -75,6 +75,11 @@
 			<artifactId>hypersistence-utils-hibernate-60</artifactId>
 			<version>3.7.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-spatial</artifactId>
+		</dependency>
+
 
 
 		<!-- JWT dependencies -->
