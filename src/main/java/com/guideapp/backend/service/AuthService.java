@@ -44,7 +44,10 @@ public class AuthService {
         {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             User user = userRepo.findByEmail(loginRequest.getEmail()).orElseThrow();
-            return new AuthResponse(user.getId(), user.getUsername(), user.getEmail(), jwtService.getToken(user));
+
+            // for security
+            user.setPassword("");
+            return new AuthResponse(user, jwtService.getToken(user));
         }
         catch (BadCredentialsException e)
         {
@@ -78,6 +81,10 @@ public class AuthService {
 
         this.userRepo.save(user);
         UUID userId = user.getId();
-        return new AuthResponse(userId, user.getUsername(), user.getEmail(), jwtService.getToken(user));
+        user.setId(userId);
+
+        //for security
+        user.setPassword("");
+        return new AuthResponse(user, jwtService.getToken(user));
     }
 }
