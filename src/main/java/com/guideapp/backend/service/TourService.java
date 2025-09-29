@@ -4,10 +4,11 @@ package com.guideapp.backend.service;
 import com.guideapp.backend.dto.request.CreateLocationRequest;
 import com.guideapp.backend.dto.request.CreateTourRequest;
 import com.guideapp.backend.dto.response.SuccessResponse;
+import com.guideapp.backend.entity.Favorite;
 import com.guideapp.backend.entity.Location;
 import com.guideapp.backend.entity.Tour;
 import com.guideapp.backend.entity.User;
-import com.guideapp.backend.exception.AuthenticationException;
+import com.guideapp.backend.repository.FavoriteRepository;
 import com.guideapp.backend.repository.LocationRepository;
 import com.guideapp.backend.repository.TourRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,13 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.locationtech.jts.geom.Point;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Timestamp;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +36,12 @@ public class TourService {
     private final UserService userService;
     private final TourRepository tourRepository;
     private final LocationRepository locationRepository;
+    private final FavoriteRepository favoriteRepository;
+
+    // return all tours
+    public List<Tour> getAllTours() {
+        return tourRepository.findAll();
+    }
 
     public Tour findById(UUID id) {
         return tourRepository.getReferenceById(id);
@@ -49,8 +56,27 @@ public class TourService {
         return tourRepository.findByGuideId(guide.getId());
     }
 
-    public List<Tour> getAcquired() {
-        return null;
+    public List<Tour> getAcquiredTours() {
+        User tourist = userService.getCurrentUser();
+        List<Favorite> favorites = favoriteRepository.findByUserIdWithTour(tourist.getId());
+        System.out.println(tourist.getId());
+        System.out.println(favorites.size());
+        return favorites.stream()
+                .map(Favorite::getTour)
+                .toList();
+    }
+
+    public SuccessResponse acquireTour(UUID tourId) {
+        Favorite favorite = new Favorite();
+
+        User tourist = userService.getCurrentUser();
+        Tour tour = tourRepository.getReferenceById(tourId);
+
+        favorite.setTour(tour);
+        favorite.setUser(tourist);
+        favoriteRepository.save(favorite);
+
+        return new SuccessResponse("SUCCESS", Instant.now());
     }
 
     public SuccessResponse createTour(CreateTourRequest request) {
@@ -61,6 +87,7 @@ public class TourService {
         tour.setCountry(request.getCountry());
         tour.setStatus("published");
         tour.setThumbnailUrl(request.getThumbnail());
+
         tour.setRatingAvg((request.getRating_avg()));
         tour.setViews((request.getRating_n()));
         tour.setCreatedAt(new Date());
@@ -74,22 +101,16 @@ public class TourService {
             Location location = new Location();
             location.setTour(tour);
             location.setName(lReq.getName());
-
-            // --- CREATING THE COORDINATES IN PROPER FORMAT ---
-            Coordinate[] coordinates = new Coordinate[]{new Coordinate(lReq.getLongitude(), lReq.getLatitude())};
-            CoordinateSequence coordinateSequence = new CoordinateArraySequence(coordinates);
-            GeometryFactory geometryFactory = new GeometryFactory();
-            Point point = geometryFactory.createPoint(coordinateSequence);
-
-            location.setCoordinates(point);
+            location.setLongitude(lReq.getLongitude());
+            location.setLatitude(lReq.getLatitude());
             location.setDescription(lReq.getDescription());
             location.setCategory(lReq.getCategory());
-            location.setMediaUrls(lReq.getMediaUrls());
             location.setOrderIndex(locationIndex);
             locationIndex++;
 
             location.setCreatedAt(new Date());
 
+            location.setMediaUrls(lReq.getMediaUrls());
             locationRepository.save(location);
         }
 

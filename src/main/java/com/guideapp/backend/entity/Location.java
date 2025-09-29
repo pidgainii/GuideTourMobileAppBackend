@@ -31,9 +31,11 @@ public class Location {
     @Column(nullable = false)
     private String name;
 
-    // 4326 is the standard used by GPS (longitude and latitude)
-    @Column(columnDefinition = "GEOGRAPHY(POINT, 4326", nullable = false)
-    private Point coordinates;
+    @Column(nullable = false)
+    private double longitude;
+
+    @Column(nullable = false)
+    private double latitude;
 
     private String description;
 

@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface TourRepository extends JpaRepository<Tour, UUID> {
     List<Tour> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String query1, String query2);
     List<Tour> findByGuideId(UUID id);
+
 }
