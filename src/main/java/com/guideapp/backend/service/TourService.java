@@ -40,7 +40,8 @@ public class TourService {
 
     // return all tours
     public List<Tour> getAllTours() {
-        return tourRepository.findAll();
+        User tourist = userService.getCurrentUser();
+        return tourRepository.findAllExcludingAcquired(tourist.getId());
     }
 
     public Tour findById(UUID id) {
@@ -59,11 +60,14 @@ public class TourService {
     public List<Tour> getAcquiredTours() {
         User tourist = userService.getCurrentUser();
         List<Favorite> favorites = favoriteRepository.findByUserIdWithTour(tourist.getId());
-        System.out.println(tourist.getId());
-        System.out.println(favorites.size());
+
         return favorites.stream()
                 .map(Favorite::getTour)
                 .toList();
+    }
+
+    public List<Location> getLocationTours(UUID tourId) {
+        return locationRepository.findByTourId(tourId);
     }
 
     public SuccessResponse acquireTour(UUID tourId) {
@@ -76,6 +80,13 @@ public class TourService {
         favorite.setUser(tourist);
         favoriteRepository.save(favorite);
 
+        return new SuccessResponse("SUCCESS", Instant.now());
+    }
+
+    public SuccessResponse removeTour(UUID tourId) {
+
+        User tourist = userService.getCurrentUser();
+        favoriteRepository.deleteByUserIdAndTourId(tourist.getId(), tourId);
         return new SuccessResponse("SUCCESS", Instant.now());
     }
 

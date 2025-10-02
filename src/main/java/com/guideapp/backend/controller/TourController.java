@@ -4,6 +4,7 @@ package com.guideapp.backend.controller;
 import com.guideapp.backend.dto.request.CreateLocationRequest;
 import com.guideapp.backend.dto.request.CreateTourRequest;
 import com.guideapp.backend.dto.response.SuccessResponse;
+import com.guideapp.backend.entity.Location;
 import com.guideapp.backend.entity.Tour;
 import com.guideapp.backend.service.TourService;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,18 @@ public class TourController {
     public ResponseEntity<SuccessResponse> acquireTour(@PathVariable UUID tourId) {
         SuccessResponse response = tourService.acquireTour(tourId);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{tourId}/remove")
+    public ResponseEntity<SuccessResponse> removeTour(@PathVariable UUID tourId) {
+        SuccessResponse response = tourService.removeTour(tourId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{tourId}/locations")
+    public ResponseEntity<List<Location>> getLocationsTours(@PathVariable UUID tourId) {
+        List<Location> locations = tourService.getLocationTours(tourId);
+        return ResponseEntity.ok(locations);
     }
 
     @GetMapping("/acquired")

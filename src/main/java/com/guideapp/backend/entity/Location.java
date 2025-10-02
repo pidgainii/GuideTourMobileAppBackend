@@ -1,5 +1,6 @@
 package com.guideapp.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class Location {
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Tour.class)
     @JoinColumn(name = "tour_id", nullable = false)
+    @JsonIgnore
     private Tour tour;
 
     @Column(nullable = false)
